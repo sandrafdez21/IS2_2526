@@ -5,13 +5,23 @@ import es.unican.is2.seguroscommon.*;
 /**
  * De lleva a cabo la gestion de seguros
  */
-public class GestionSeguros {
+public class GestionSeguros implements IGestionClientes, IGestionSeguros, IInfoSeguros {
     
     // Atributos
     private IClientesDAO clientesDAO;
     private ISegurosDAO  segurosDAO;
 
     // Metodos
+	/**
+	 * Metodo constructor de GestionSeguros
+	 * @param clientesDAO Acceso a los clientes 
+	 * @param segurosDAO Acceso a los seguros
+	 */
+	public GestionSeguros (IClientesDAO clientesDAO, ISegurosDAO segurosDAO) {
+		this.clientesDAO = clientesDAO;
+		this.segurosDAO = segurosDAO;
+	}
+
     /**
 	 * Persiste un nuevo cliente
 	 * @param c Cliente que desea persistir
@@ -21,7 +31,8 @@ public class GestionSeguros {
 	 * en el acceso a la base de datos
 	 */
 	public Cliente nuevoCliente(Cliente c) throws DataAccessException {
-        return null;
+		c = clientesDAO.creaCliente(c);
+		return c;
     }
 	
 	/**
@@ -35,7 +46,14 @@ public class GestionSeguros {
 	 * en el acceso a la base de datos
 	 */
 	public Cliente bajaCliente(String dni) throws OperacionNoValida,DataAccessException {
-        return null;
+        Cliente c = clientesDAO.cliente(dni);
+		if (c == null) {
+			return null;
+		}
+		if (!c.getSeguros().isEmpty()) {
+			throw new OperacionNoValida("El cliente no se puede eliminar porque tiene seguros a su nombre");
+		}
+		return clientesDAO.eliminaCliente(dni);
     }
 		
     /**
@@ -49,7 +67,19 @@ public class GestionSeguros {
 	 * en el acceso a la base de datos
 	 */
 	public Seguro nuevoSeguro(Seguro s, String dni) throws OperacionNoValida, DataAccessException {
-        return null;
+        Cliente c = clientesDAO.cliente(dni);
+		if (c == null) {
+			return null;
+		}
+
+		if (segurosDAO.seguroPorMatricula(s.getMatricula()) != null) {
+			throw new OperacionNoValida("El seguro ya existe");
+		}
+
+		c.anhadirSeguro(s);
+
+		clientesDAO.actualizaCliente(c);
+		return segurosDAO.creaSeguro(s);
     }
 	
 	/**
@@ -64,7 +94,29 @@ public class GestionSeguros {
 	 * en el acceso a la base de datos
 	 */
 	public Seguro bajaSeguro(String matricula, String dni) throws OperacionNoValida, DataAccessException {
-        return null;
+        Cliente c = clientesDAO.cliente(dni);
+		Seguro s = segurosDAO.seguroPorMatricula(matricula);
+		
+		if (c == null || s == null) {
+			return null;
+		}
+
+		Boolean lePertenece = false;
+		for (Seguro s1: c.getSeguros()) {
+			if (s1.equals(s)) {
+				lePertenece = true;
+				break;
+			}
+		}
+		if (!lePertenece) {
+			throw new OperacionNoValida("El seguro no le pertenece a esa persona");
+		}
+
+		c.quitarSeguro(s);
+
+		clientesDAO.actualizaCliente(c);
+
+		return segurosDAO.eliminaSeguro(s.getId());
     }
 
 	/**
@@ -77,7 +129,14 @@ public class GestionSeguros {
 	 * en el acceso a la base de datos
 	 */
 	public Seguro anhadeConductorAdicional(String matricula, String conductor) throws DataAccessException {
-        return null;
+        Seguro s = segurosDAO.seguroPorMatricula(matricula);
+		if (s == null) {
+			return null;
+		}
+
+		s.setConductorAdicional(conductor);
+
+		return segurosDAO.actualizaSeguro(s);
     }
 
     /**
@@ -89,7 +148,13 @@ public class GestionSeguros {
 	 * en el acceso a la base de datos
 	 */
 	public Cliente cliente(String dni) throws DataAccessException {
-        return null;
+        Cliente c = clientesDAO.cliente(dni);
+		
+		if (c == null) {
+			return null;
+		}
+		
+		return c;
     }
 	
 	/**
@@ -101,9 +166,12 @@ public class GestionSeguros {
 	 * en el acceso a la base de datos
 	 */
 	public Seguro seguro(String matricula) throws DataAccessException {
-        return null;
+		Seguro s = segurosDAO.seguroPorMatricula(matricula);
+		
+		if (s == null) {
+			return null;
+		}
+
+		return s;
     }
-
-
-
 }

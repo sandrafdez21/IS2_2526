@@ -117,7 +117,37 @@ public class Seguro {
 	 *         0 si el seguro todavía no está en vigor (no se ha alcanzado su fecha de inicio)
      */
 	public double precio() {
-		return 0;
+		double precio;
+		LocalDate hoy = LocalDate.now();
+
+		// Devuelve 0 si todavia no ha entrado en vigor
+		if (hoy.isBefore(fechaInicio)) {
+			return 0.0;
+		}
+
+		// Aplica cobertura
+		if (cobertura == Cobertura.TODO_RIESGO) {
+			precio = 1000.0;
+		} else if (cobertura == Cobertura.TERCEROS_LUNAS) {
+			precio = 600.0;
+		} else {
+			precio = 400.0;
+		}
+
+		// Subida en funcion de potencia
+		if (potencia > 110) {
+			precio = precio * 1.20;
+		} else if (potencia > 90) {
+			precio = precio * 1.05;
+		}
+
+		// Se descuenta oferta por el primer año
+		LocalDate finAno = fechaInicio.plusYears(1).plusDays(1);
+		if (hoy.isBefore(finAno)) {
+			precio = precio * 0.80;
+		}
+
+		return precio;
 	}
 	
 }

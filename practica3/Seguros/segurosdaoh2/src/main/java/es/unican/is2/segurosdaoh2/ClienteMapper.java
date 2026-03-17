@@ -14,6 +14,9 @@ import es.unican.is2.seguroscommon.DataAccessException;
  */
 public class ClienteMapper {
 
+	private ClienteMapper() {
+	}
+
 	/**
 	 * Recibe una fila de la BBDD correspondinete a un Cliente 
 	 * y devuelve un objeto Cliente con los datos correspondientes

@@ -32,9 +32,12 @@ public class ClientesDAO implements IClientesDAO {
 	public Cliente cliente(String dni) throws DataAccessException {
 		Cliente result = null; 
 		Connection con = H2ServerConnectionManager.getConnection();
+		
+		Statement statement = null;
+
 		try {
-			Statement statement = con.createStatement();
-			String statementText = "select * from Clientes where dni = '"+ dni+"'";
+			statement = con.createStatement();
+			String statementText = "select dni, nombre, minusvalia from Clientes where dni = '"+ dni+"'";
 			ResultSet results = statement.executeQuery(statementText);
 			if (results.next()) { 
 				result = procesaCliente(con,results);
@@ -44,7 +47,14 @@ public class ClientesDAO implements IClientesDAO {
 		catch (SQLException e) {
 			e.printStackTrace();
 			throw new DataAccessException();
-		}
+		} finally {
+                if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
 		return result;
 	}
 
@@ -86,9 +96,12 @@ public class ClientesDAO implements IClientesDAO {
 	public List<Cliente> clientes() throws DataAccessException {
 		List<Cliente> clientes = new LinkedList<Cliente>();
 		Connection con = H2ServerConnectionManager.getConnection(); 
+		
+		Statement statement = null;
+		
 		try {
-			Statement statement = con.createStatement(); 
-			String statementText = "select * from Clientes"; 
+			statement = con.createStatement(); 
+			String statementText = "select dni, nombre, minusvalia from Clientes"; 
 			ResultSet results = statement.executeQuery(statementText); 
 			// Procesamos cada fila como vehiculo independiente
 			while (results.next()) {
@@ -98,7 +111,14 @@ public class ClientesDAO implements IClientesDAO {
 		} catch (SQLException e) {
 			// System.out.println(e);
 			throw new DataAccessException();
-		}
+		} finally {
+                if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
 
 		return clientes;
 	}
@@ -107,7 +127,7 @@ public class ClientesDAO implements IClientesDAO {
 		Cliente result = ClienteMapper.toCliente(results);
 		// Cargamos los seguros del cliente
 		Statement statement = con.createStatement();
-		String statementText = String.format("select * from Seguros where cliente_FK = '%s'", result.getDni());
+		String statementText = String.format("select id, matricula, potencia, cobertura, fechaInicio, conductorAdicional from Seguros where cliente_FK = '%s'", result.getDni());
 		results = statement.executeQuery(statementText);
 		while (results.next()) {
 			result.getSeguros().add(SeguroMapper.toSeguro(results));

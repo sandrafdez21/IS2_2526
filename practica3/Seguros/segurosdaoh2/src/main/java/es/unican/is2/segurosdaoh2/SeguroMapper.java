@@ -14,6 +14,9 @@ import es.unican.is2.seguroscommon.Seguro;
  */
 public class SeguroMapper {
 
+	private SeguroMapper() {
+	}
+
 	/**
 	 * Recibe una fila de la BBDD correspondiente a un seguro 
 	 * y devuelve un objeto Seguro con los datos correspondientes

@@ -30,9 +30,9 @@ public class VistaAgente extends JFrame {
 	private DefaultListModel<String> listModel;
 	private JButton btnBuscar;
 	
-	private IGestionClientes clientes;
-	private IGestionSeguros seguros;
-	private IInfoSeguros info;
+	private transient IGestionClientes clientes;
+	private transient IGestionSeguros seguros;
+	private transient IInfoSeguros info;
 
 	/**
 	 * Create the frame.

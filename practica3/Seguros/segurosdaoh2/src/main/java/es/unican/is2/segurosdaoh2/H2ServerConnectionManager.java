@@ -24,6 +24,9 @@ public class H2ServerConnectionManager {
 	protected static String user = "sa";
 	protected static String pass = "";
 
+	private H2ServerConnectionManager() {
+	}
+
 	/**
 	 * Obtiene una conexion con la base de datos
 	 * @return La conexion
@@ -38,7 +41,7 @@ public class H2ServerConnectionManager {
 				cargaDatos();
 			} catch (SQLException | ClassNotFoundException e) {
 				throw new DataAccessException();
-			}
+			} 
 		}
 		return connection;
 	}

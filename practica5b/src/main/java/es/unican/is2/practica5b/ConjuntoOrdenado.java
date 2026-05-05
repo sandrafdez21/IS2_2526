@@ -1,3 +1,5 @@
+package es.unican.is2.practica5b;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +17,14 @@ public class ConjuntoOrdenado<E extends Comparable<E>> implements IConjuntoOrden
 
 	public boolean add(E elemento) {
 		int indice = 0;
-		if (elemento==null)
+		if (elemento==null) {
 			throw new NullPointerException();
+		} 
+		if (lista.contains(elemento) ) {
+			return false;
+		}
 		if (lista.size() != 0) {
-			while (indice < lista.size() && elemento.compareTo(lista.get(indice)) < 0) {
+			while (indice < lista.size() && elemento.compareTo(lista.get(indice)) > 0) {
 				indice++;
 			}
 		}

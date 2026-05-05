@@ -1,0 +1,7 @@
+# Ignora todos los targets
+**/target/
+
+# Ignora la configuracion de vs code
+.vscode
+**/.vscode
+
